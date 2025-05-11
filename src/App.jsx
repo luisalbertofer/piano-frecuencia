@@ -18,7 +18,7 @@ function App() {
     if (!isAudioReady) return;
 
     const initializeSynth = async () => {
-      const fft = new Tone.Analyser("fft", 64); // puedes probar 32, 64, 128...
+      const fft = new Tone.Analyser("fft", 512); // puedes probar 32, 64, 128...
       const waveform = new Tone.Analyser("waveform", 1024);
       const newSynth = new Tone.Synth({ oscillator: { type: timbre } });
 
@@ -142,9 +142,23 @@ function App() {
           <p>Haz clic en una tecla para empezar</p>
         )}
       </div>
-      {analyser && analyser.waveform && <VisualizadorOnda analyser={analyser.waveform} />}
-      {analyser && analyser.fft && <VisualizadorFFT analyser={analyser.fft} />}
+      <div style={{ marginTop: "2rem" }}>
+        {/* Visualizador de Onda */}
+        {analyser && analyser.waveform && (
+          <div>
+            <h3 style={{ marginBottom: "0.5rem", color: "#2C3E50" }}>Visualizador de Onda</h3>
+            <VisualizadorOnda analyser={analyser.waveform} />
+          </div>
+        )}
 
+        {/* Visualizador FFT */}
+        {analyser && analyser.fft && (
+          <div style={{ marginTop: "2rem" }}>
+            <h3 style={{ marginBottom: "0.5rem", color: "#2C3E50" }}>Visualizador FFT</h3>
+            <VisualizadorFFT analyser={analyser.fft} />
+          </div>
+        )}
+      </div>
     </div>
   );
 }
