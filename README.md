@@ -26,7 +26,7 @@ Sigue estos pasos para ejecutar el proyecto en tu máquina local:
 
 1. Clona este repositorio:
    ```bash
-   git clone https://github.com/tu-usuario/piano-frecuencia.git
+   git clone https://github.com/luisalbertofer/piano-frecuencia
    cd piano-frecuencia
 
 2. Instala las dependencias:
