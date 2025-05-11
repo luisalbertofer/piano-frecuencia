@@ -39,7 +39,8 @@ Sigue estos pasos para ejecutar el proyecto en tu máquina local:
 
 Abre tu navegador en http://localhost:5173 para ver la aplicación.
 
-Uso 🖱️
+## Uso 🖱️
+
 1. Haz clic en las teclas del piano para reproducir notas.
 2. Cambia el timbre del sintetizador usando el selector desplegable.
 3. Observa la frecuencia y el rango auditivo de cada nota en tiempo real.
