@@ -1,15 +1,16 @@
 import React from "react";
 
 const getGroupColor = (note) => {
-  if (note.includes("2")) return "#FFD700"; // Amarillo para el grupo 2
-  if (note.includes("3")) return "#FF7F50"; // Coral para el grupo 3
-  if (note.includes("4")) return "#87CEEB"; // Azul claro para el grupo 4
-  if (note.includes("5")) return "#32CD32"; // Verde para el grupo 5
-  if (note.includes("6")) return "#BA55D3"; // Morado para el grupo 6
-  if (note.includes("7")) return "#FF4500"; // Naranja para el grupo 7
+  if (note.includes("1")) return "#A9A9A9"; // Gris para octava 1
+  if (note.includes("2")) return "#FFD700"; // Amarillo
+  if (note.includes("3")) return "#FF7F50"; // Coral
+  if (note.includes("4")) return "#87CEEB"; // Azul claro
+  if (note.includes("5")) return "#32CD32"; // Verde
+  if (note.includes("6")) return "#BA55D3"; // Morado
+  if (note.includes("7")) return "#FF4500"; // Naranja
+  if (note.includes("8")) return "#FF00FF"; // Rosa neón
   return "#FFFFFF"; // Blanco por defecto
 };
-
 const PianoVirtual = ({ notes, playNote, currentNote }) => {
   return (
     <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
