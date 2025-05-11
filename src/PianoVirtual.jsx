@@ -10,7 +10,7 @@ const getGroupColor = (note) => {
   return "#FFFFFF"; // Blanco por defecto
 };
 
-const PianoVirtual = ({ notes, playNote }) => {
+const PianoVirtual = ({ notes, playNote, currentNote }) => {
   return (
     <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
       {notes.map(({ note, freq, name }) => (
@@ -21,7 +21,11 @@ const PianoVirtual = ({ notes, playNote }) => {
             width: note.includes("#") ? "30px" : "40px",
             height: "150px",
             margin: "1px",
-            backgroundColor: note.includes("#") ? "#000" : getGroupColor(note),
+            backgroundColor: note.includes("#")
+              ? "#000"
+              : currentNote?.note === note
+              ? "#f39c12" // Resalta la tecla actual (naranja)
+              : getGroupColor(note),
             color: note.includes("#") ? "#fff" : "#000",
             display: "flex",
             flexDirection: "column",
@@ -32,6 +36,8 @@ const PianoVirtual = ({ notes, playNote }) => {
             border: "1px solid #333",
             position: "relative",
             zIndex: note.includes("#") ? 1 : 0,
+            transition: "background-color 0.3s ease, transform 0.2s ease",
+            transform: currentNote?.note === note ? "scale(1.1)" : "scale(1)", // Animación de escala
           }}
         >
           <div>{note}</div>

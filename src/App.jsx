@@ -1,7 +1,5 @@
 import React, { useState } from "react";
-import FrequencyBar from "./FrequencyBar";
-import FrequencyCircle from "./FrequencyCircle";
-import PianoVisual from "./PianoVisual";
+
 import PianoVirtual from "./PianoVirtual";
 import * as Tone from "tone";
 import { notes } from "./notes";
@@ -40,7 +38,7 @@ function App() {
     <div style={{ padding: "2rem", textAlign: "center" }}>
       <h1>Piano Frecuencia Visual</h1>
 
-<PianoVirtual notes={notes} playNote={playNote} />
+      <PianoVirtual notes={notes} playNote={playNote} currentNote={currentNote} />
 
       {currentNote && (
         <div style={{ marginTop: "2rem", fontSize: "1.5rem" }}>
