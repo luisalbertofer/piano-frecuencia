@@ -2,20 +2,32 @@ import React, { useState, useEffect } from "react";
 import PianoVirtual from "./PianoVirtual";
 import * as Tone from "tone";
 import { notes } from "./notes";
+import VisualizadorOnda from "./VisualizadorOnda";
+import VisualizadorFFT from "./VisualizadorFFT";
 
 function App() {
   const [currentNote, setCurrentNote] = useState(null);
   const [synth, setSynth] = useState(null);
   const [timbre, setTimbre] = useState("sine");
   const [isAudioReady, setIsAudioReady] = useState(false);
+  const [analyser, setAnalyser] = useState(null);
+
 
   // Inicializa el sintetizador después de la primera interacción del usuario
   useEffect(() => {
     if (!isAudioReady) return;
 
     const initializeSynth = async () => {
-      const s = new Tone.Synth({ oscillator: { type: timbre } }).toDestination();
-      setSynth(s);
+      const fft = new Tone.Analyser("fft", 64); // puedes probar 32, 64, 128...
+      const waveform = new Tone.Analyser("waveform", 1024);
+      const newSynth = new Tone.Synth({ oscillator: { type: timbre } });
+
+      newSynth.connect(waveform);
+      newSynth.connect(fft);
+      waveform.connect(Tone.Destination); // solo necesitas uno conectado al output
+
+      setSynth(newSynth);
+      setAnalyser({ waveform, fft });
     };
 
     initializeSynth();
@@ -130,6 +142,9 @@ function App() {
           <p>Haz clic en una tecla para empezar</p>
         )}
       </div>
+      {analyser && analyser.waveform && <VisualizadorOnda analyser={analyser.waveform} />}
+      {analyser && analyser.fft && <VisualizadorFFT analyser={analyser.fft} />}
+
     </div>
   );
 }
