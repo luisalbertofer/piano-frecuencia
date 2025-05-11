@@ -4,6 +4,7 @@ import * as Tone from "tone";
 import { notes } from "./notes";
 import VisualizadorOnda from "./VisualizadorOnda";
 import VisualizadorFFT from "./VisualizadorFFT";
+import ComparadorDeNotas from "./ComparadorDeNotas";
 
 function App() {
   const [currentNote, setCurrentNote] = useState(null);
@@ -157,6 +158,11 @@ function App() {
             <h3 style={{ marginBottom: "0.5rem", color: "#2C3E50" }}>Visualizador FFT</h3>
             <VisualizadorFFT analyser={analyser.fft} />
           </div>
+        )}
+
+        {/* Comparador de notas */}
+        {synth && (
+          <ComparadorDeNotas notes={notes} synth={synth} />
         )}
       </div>
     </div>
