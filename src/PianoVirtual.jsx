@@ -1,50 +1,47 @@
-import React from "react";
-
 const getGroupColor = (note) => {
-  if (note.includes("1")) return "#A9A9A9"; // Gris para octava 1
-  if (note.includes("2")) return "#FFD700"; // Amarillo
-  if (note.includes("3")) return "#FF7F50"; // Coral
-  if (note.includes("4")) return "#87CEEB"; // Azul claro
-  if (note.includes("5")) return "#32CD32"; // Verde
-  if (note.includes("6")) return "#BA55D3"; // Morado
-  if (note.includes("7")) return "#FF4500"; // Naranja
-  if (note.includes("8")) return "#FF00FF"; // Rosa neón
-  return "#FFFFFF"; // Blanco por defecto
+  if (note.includes("1")) return "bg-gray-300";
+  if (note.includes("2")) return "bg-yellow-300";
+  if (note.includes("3")) return "bg-orange-300";
+  if (note.includes("4")) return "bg-sky-300";
+  if (note.includes("5")) return "bg-green-300";
+  if (note.includes("6")) return "bg-purple-300";
+  if (note.includes("7")) return "bg-orange-400";
+  if (note.includes("8")) return "bg-pink-400";
+  return "bg-white";
 };
+
 const PianoVirtual = ({ notes, playNote, currentNote }) => {
   return (
-    <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-      {notes.map(({ note, freq, name }) => (
-        <div
-          key={note}
-          onClick={() => playNote(note, freq)}
-          style={{
-            width: note.includes("#") ? "30px" : "40px",
-            height: "150px",
-            margin: "1px",
-            backgroundColor: note.includes("#")
-              ? "#000"
-              : currentNote?.note === note
-              ? "#f39c12" // Resalta la tecla actual (naranja)
-              : getGroupColor(note),
-            color: note.includes("#") ? "#fff" : "#000",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "center",
-            fontSize: "12px",
-            fontWeight: "bold",
-            border: "1px solid #333",
-            position: "relative",
-            zIndex: note.includes("#") ? 1 : 0,
-            transition: "background-color 0.3s ease, transform 0.2s ease",
-            transform: currentNote?.note === note ? "scale(1.1)" : "scale(1)", // Animación de escala
-          }}
-        >
-          <div>{note}</div>
-          <div style={{ fontSize: "10px", marginTop: "4px" }}>{name}</div>
-        </div>
-      ))}
+    <div className="flex justify-center items-end flex-wrap gap-[2px] p-4">
+      {notes.map(({ note, freq, name }) => {
+        const isSharp = note.includes("#");
+        const isCurrent = currentNote?.note === note;
+
+        // Define clases base
+        let classes = "h-36 flex flex-col justify-center items-center font-bold text-xs border border-gray-600 rounded transition-transform duration-200 ease-in-out";
+
+        if (isSharp) {
+          classes += " bg-black text-white w-8 z-10";
+        } else {
+          classes += ` ${getGroupColor(note)} text-black w-10`;
+        }
+
+        if (isCurrent) {
+          classes += " scale-110 ring-2 ring-yellow-400";
+        }
+
+        return (
+          <button
+            key={note}
+            onClick={() => playNote(note, freq)}
+            className={classes}
+            title={`${note} - ${name}`}
+          >
+            <div>{note}</div>
+            <div className="text-[10px] mt-1">{name}</div>
+          </button>
+        );
+      })}
     </div>
   );
 };

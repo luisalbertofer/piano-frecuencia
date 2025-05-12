@@ -4,7 +4,7 @@ import * as Tone from "tone";
 import { notes } from "./notes";
 import VisualizadorOnda from "./VisualizadorOnda";
 import VisualizadorFFT from "./VisualizadorFFT";
-import ComparadorDeNotas from "./ComparadorDeNotas";
+// import ComparadorDeNotas from "./ComparadorDeNotas";
 
 function App() {
   const [currentNote, setCurrentNote] = useState(null);
@@ -13,28 +13,21 @@ function App() {
   const [isAudioReady, setIsAudioReady] = useState(false);
   const [analyser, setAnalyser] = useState(null);
 
-
-  // Inicializa el sintetizador después de la primera interacción del usuario
   useEffect(() => {
     if (!isAudioReady) return;
-
     const initializeSynth = async () => {
-      const fft = new Tone.Analyser("fft", 512); // puedes probar 32, 64, 128...
+      const fft = new Tone.Analyser("fft", 512);
       const waveform = new Tone.Analyser("waveform", 1024);
       const newSynth = new Tone.Synth({ oscillator: { type: timbre } });
-
       newSynth.connect(waveform);
       newSynth.connect(fft);
-      waveform.connect(Tone.Destination); // solo necesitas uno conectado al output
-
+      waveform.toDestination();
       setSynth(newSynth);
       setAnalyser({ waveform, fft });
     };
-
     initializeSynth();
   }, [isAudioReady, timbre]);
 
-  // Escuchar la primera interacción del usuario (click o touchstart)
   useEffect(() => {
     const handleFirstInteraction = async () => {
       await Tone.start();
@@ -42,17 +35,14 @@ function App() {
       document.removeEventListener("click", handleFirstInteraction);
       document.removeEventListener("touchstart", handleFirstInteraction);
     };
-
     document.addEventListener("click", handleFirstInteraction);
     document.addEventListener("touchstart", handleFirstInteraction);
-
     return () => {
       document.removeEventListener("click", handleFirstInteraction);
       document.removeEventListener("touchstart", handleFirstInteraction);
     };
   }, []);
 
-  // Cambiar el tipo de oscilador si cambia el timbre
   useEffect(() => {
     if (!synth || !isAudioReady) return;
     synth.oscillator.type = timbre;
@@ -60,7 +50,6 @@ function App() {
 
   const playNote = (note, freq) => {
     if (!synth || !isAudioReady) return;
-
     synth.triggerAttackRelease(note, "0.5");
     const rango = clasificarFrecuencia(freq);
     setCurrentNote({ note, freq, rango });
@@ -73,50 +62,40 @@ function App() {
     if (freq <= 2000) return "medio-alto";
     if (freq <= 4000) return "agudo";
     if (freq <= 8000) return "muy agudo";
-    return "ultra-agudo"; // opcional para frecuencias muy altas
+    return "ultra-agudo";
   };
 
   const getColor = (rango) => {
     switch (rango) {
-      case "muy grave":
-        return "#5D6D7E"; // gris oscuro
-      case "grave":
-        return "#2ECC71"; // verde
-      case "medio-bajo":
-        return "#F1C40F"; // amarillo
-      case "medio-alto":
-        return "#E67E22"; // naranja
-      case "agudo":
-        return "#E74C3C"; // rojo
-      case "muy agudo":
-        return "#9B59B6"; // morado
-      case "ultra-agudo":
-        return "#3498DB"; // azul brillante
-      default:
-        return "#000";
+      case "muy grave": return "text-gray-700";
+      case "grave": return "text-green-600";
+      case "medio-bajo": return "text-yellow-600";
+      case "medio-alto": return "text-orange-600";
+      case "agudo": return "text-red-500";
+      case "muy agudo": return "text-purple-500";
+      case "ultra-agudo": return "text-blue-600";
+      default: return "text-black";
     }
   };
 
   return (
-    <div style={{ padding: "2rem", textAlign: "center", fontFamily: "Arial, sans-serif" }}>
-      <h1 style={{ marginBottom: "1rem" }}>🎹 Piano Frecuencia Visual</h1>
+    <div className="min-h-screen bg-white text-gray-800 font-sans p-4 flex flex-col items-center">
+      <h1 className="text-3xl font-bold mb-4">🎹 Piano Frecuencia Visual</h1>
 
-      {/* Mensaje inicial hasta que el usuario active el audio */}
       {!isAudioReady && (
-        <div style={{ fontSize: "1.2rem", marginBottom: "2rem", color: "#e67e22" }}>
-          <p>Por favor, haz clic en cualquier parte para activar el sonido.</p>
+        <div className="text-orange-600 text-lg mb-6">
+          Por favor, haz clic en cualquier parte para activar el sonido.
         </div>
       )}
 
-      {/* Selector de timbre */}
-      <div style={{ marginBottom: "1rem" }}>
-        <label htmlFor="timbre" style={{ marginRight: "0.5rem" }}>Selecciona un timbre:</label>
+      <div className="mb-6 flex items-center gap-2">
+        <label htmlFor="timbre" className="text-lg font-medium">Timbre:</label>
         <select
           id="timbre"
           value={timbre}
           onChange={(e) => setTimbre(e.target.value)}
           disabled={!isAudioReady}
-          style={{ padding: "0.5rem", fontSize: "1rem" }}
+          className="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
         >
           <option value="sine">Sinusoidal</option>
           <option value="square">Cuadrada</option>
@@ -127,42 +106,35 @@ function App() {
 
       <PianoVirtual notes={notes} playNote={playNote} currentNote={currentNote} />
 
-      <div style={{ marginTop: "2rem" }}>
+      <div className="mt-6 text-lg text-center">
         {currentNote ? (
-          <div style={{ fontSize: "1.5rem" }}>
+          <>
             <p>🎵 Nota: <strong>{currentNote.note}</strong></p>
             <p>🎛️ Frecuencia: <strong>{currentNote.freq.toFixed(2)} Hz</strong></p>
             <p>
-              🔊 Rango:{" "}
-              <strong style={{ color: getColor(currentNote.rango), textTransform: "capitalize" }}>
+              🔊 Rango: <strong className={`${getColor(currentNote.rango)} capitalize`}>
                 {currentNote.rango}
               </strong>
             </p>
-          </div>
+          </>
         ) : (
-          <p>Haz clic en una tecla para empezar</p>
+          <p className="text-gray-500">Haz clic en una tecla para empezar</p>
         )}
       </div>
-      <div style={{ marginTop: "2rem" }}>
-        {/* Visualizador de Onda */}
-        {analyser && analyser.waveform && (
-          <div>
-            <h3 style={{ marginBottom: "0.5rem", color: "#2C3E50" }}>Visualizador de Onda</h3>
+
+      <div className="mt-10 w-full flex flex-col items-center gap-8">
+        {analyser?.waveform && (
+          <div className="w-full max-w-2xl">
+            <h3 className="text-xl font-semibold mb-2 text-gray-700 text-center">Visualizador de Onda</h3>
             <VisualizadorOnda analyser={analyser.waveform} />
           </div>
         )}
 
-        {/* Visualizador FFT */}
-        {analyser && analyser.fft && (
-          <div style={{ marginTop: "2rem" }}>
-            <h3 style={{ marginBottom: "0.5rem", color: "#2C3E50" }}>Visualizador FFT</h3>
+        {analyser?.fft && (
+          <div className="w-full max-w-2xl">
+            <h3 className="text-xl font-semibold mb-2 text-gray-700 text-center">Visualizador FFT</h3>
             <VisualizadorFFT analyser={analyser.fft} />
           </div>
-        )}
-
-        {/* Comparador de notas */}
-        {synth && (
-          <ComparadorDeNotas notes={notes} synth={synth} />
         )}
       </div>
     </div>
