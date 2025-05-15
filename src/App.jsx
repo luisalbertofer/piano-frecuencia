@@ -6,12 +6,15 @@ import VisualizadorOnda from "./VisualizadorOnda";
 import VisualizadorFFT from "./VisualizadorFFT";
 import VisualizadorEspectrograma from "./VisualizadorEspectrograma";
 import { motion, AnimatePresence } from "framer-motion";
+import { clasificarFrecuencia, getColor } from "./utils/audioUtils";
 // import ComparadorDeNotas from "./ComparadorDeNotas";
 
 function App() {
   const [currentNote, setCurrentNote] = useState(null);
   const [synth, setSynth] = useState(null);
   const [timbre, setTimbre] = useState("sine");
+  const [volume, setVolume] = useState(0);        // in dB, Tone.Synth.volume.value
+  const [duration, setDuration] = useState("0.5"); // in seconds
   const [isAudioReady, setIsAudioReady] = useState(false);
   const [analyser, setAnalyser] = useState(null);
   const [activeTab, setActiveTab] = useState("onda");
@@ -23,6 +26,7 @@ function App() {
       const fft = new Tone.Analyser("fft", 512);
       const waveform = new Tone.Analyser("waveform", 1024);
       const newSynth = new Tone.Synth({ oscillator: { type: timbre } });
+      newSynth.volume.value = volume; // Set initial volume
       newSynth.connect(waveform);
       newSynth.connect(fft);
       waveform.toDestination();
@@ -50,36 +54,14 @@ function App() {
   useEffect(() => {
     if (!synth || !isAudioReady) return;
     synth.oscillator.type = timbre;
+    synth.volume.value = volume;
   }, [timbre, synth, isAudioReady]);
 
   const playNote = (note, freq) => {
     if (!synth || !isAudioReady) return;
-    synth.triggerAttackRelease(note, "0.5");
+    synth.triggerAttackRelease(note, duration); 
     const rango = clasificarFrecuencia(freq);
     setCurrentNote({ note, freq, rango });
-  };
-
-  const clasificarFrecuencia = (freq) => {
-    if (freq <= 125) return "muy grave";
-    if (freq <= 250) return "grave";
-    if (freq <= 500) return "medio-bajo";
-    if (freq <= 2000) return "medio-alto";
-    if (freq <= 4000) return "agudo";
-    if (freq <= 8000) return "muy agudo";
-    return "ultra-agudo";
-  };
-
-  const getColor = (rango) => {
-    switch (rango) {
-      case "muy grave": return "text-gray-700";
-      case "grave": return "text-green-600";
-      case "medio-bajo": return "text-yellow-600";
-      case "medio-alto": return "text-orange-600";
-      case "agudo": return "text-red-500";
-      case "muy agudo": return "text-purple-500";
-      case "ultra-agudo": return "text-blue-600";
-      default: return "text-black";
-    }
   };
 
   return (
@@ -108,6 +90,39 @@ function App() {
         </select>
       </div>
 
+      <div className="w-full max-w-sm mb-4">
+        <label htmlFor="volume" className="block text-sm font-medium text-gray-700 mb-1">
+          Volumen: <span className="font-bold">{volume} dB</span>
+        </label>
+        <input
+          id="volume"
+          type="range"
+          min="-60"
+          max="0"
+          step="1"
+          value={volume}
+          onChange={e => setVolume(Number(e.target.value))}
+          disabled={!isAudioReady}
+          className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+        />
+      </div>
+
+      <div className="w-full max-w-sm mb-4">
+        <label htmlFor="duration" className="block text-sm font-medium text-gray-700 mb-1">
+          Duración: <span className="font-bold">{parseFloat(duration).toFixed(1)}s</span>
+        </label>
+        <input
+          id="duration"
+          type="range"
+          min="0.1"
+          max="2"
+          step="0.1"
+          value={duration}
+          onChange={e => setDuration(e.target.value)}
+          disabled={!isAudioReady}
+          className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-purple-500"
+        />
+      </div>
       <PianoVirtual notes={notes} playNote={playNote} currentNote={currentNote} />
 
       <div className="mt-6 text-lg text-center">
