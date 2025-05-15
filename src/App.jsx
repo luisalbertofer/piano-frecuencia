@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import PianoVirtual from "./PianoVirtual";
+import PianoVirtual from "./components/PianoVirtual";
 import * as Tone from "tone";
-import { notes } from "./notes";
-import VisualizadorOnda from "./VisualizadorOnda";
-import VisualizadorFFT from "./VisualizadorFFT";
-import VisualizadorEspectrograma from "./VisualizadorEspectrograma";
+import { notes } from "./data/notes";
+import VisualizadorOnda from "./components/visualizers/VisualizadorOnda";
+import VisualizadorFFT from "./components/visualizers/VisualizadorFFT";
+import VisualizadorEspectrograma from "./components/visualizers/VisualizadorEspectrograma";
 import { motion, AnimatePresence } from "framer-motion";
 import { clasificarFrecuencia, getColor } from "./utils/audioUtils";
 // import ComparadorDeNotas from "./ComparadorDeNotas";
