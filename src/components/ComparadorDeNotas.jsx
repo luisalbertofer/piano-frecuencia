@@ -13,21 +13,20 @@ const ComparadorDeNotas = ({ notes, synth }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [stats, setStats] = useState({ correct: 0, total: 0 });
 
-  const reproducirNotas = () => {
+  const generarParDeNotas = () => {
     const distancia = grados[dificultad];
     const maxIndex = notes.length - distancia;
     const base = Math.floor(Math.random() * maxIndex);
     const ascending = Math.random() < 0.5;
 
-    let nota1, nota2;
-    if (ascending) {
-      nota1 = notes[base];
-      nota2 = notes[base + distancia];
-    } else {
-      nota1 = notes[base + distancia];
-      nota2 = notes[base];
-    }
+    const nota1 = ascending ? notes[base] : notes[base + distancia];
+    const nota2 = ascending ? notes[base + distancia] : notes[base];
 
+    return [nota1, nota2];
+  };
+
+  const reproducirNotas = () => {
+    const [nota1, nota2] = generarParDeNotas();
     setNotasActivas([nota1, nota2]);
     setResultado(null);
     setIsPlaying(true);
@@ -42,11 +41,9 @@ const ComparadorDeNotas = ({ notes, synth }) => {
     if (notasActivas.length < 2 || isPlaying) return;
 
     const [n1, n2] = notasActivas;
-    let correcta;
-    if (n2.freq === n1.freq) correcta = "igual";
-    else correcta = n2.freq > n1.freq ? "agudo" : "grave";
-
+    const correcta = n2.freq > n1.freq ? "agudo" : "grave";
     const acierto = respuesta === correcta;
+
     setResultado(acierto ? "✅ ¡Correcto!" : `❌ Incorrecto (era ${correcta})`);
     setStats((s) => ({
       correct: s.correct + (acierto ? 1 : 0),
@@ -59,21 +56,28 @@ const ComparadorDeNotas = ({ notes, synth }) => {
 
     setTimeout(() => {
       setIsPlaying(false);
-      reproducirNotas();
+      reproducirNotas(); // flujo continuo
     }, 4000);
   };
 
-  return (
-    <div className="mt-8 p-4 border rounded bg-gray-50">
-      <h2 className="text-xl font-semibold mb-2">🎵 Comparador de Notas</h2>
+  const resetJuego = () => {
+    setStats({ correct: 0, total: 0 });
+    setNotasActivas([]);
+    setResultado(null);
+    setIsPlaying(false);
+  };
 
-      <div className="mb-3">
-        <label htmlFor="dificultad" className="mr-2">Dificultad:</label>
+  return (
+    <div className="w-full max-w-3xl mx-auto mt-8 p-6 border rounded bg-white shadow-md">
+      <h2 className="text-2xl font-bold mb-4 text-center">🎵 Comparador de Notas</h2>
+
+      <div className="mb-4 flex flex-col gap-2">
+        <label htmlFor="dificultad" className="font-medium">Dificultad:</label>
         <select
           id="dificultad"
           value={dificultad}
           onChange={(e) => setDificultad(e.target.value)}
-          className="p-1"
+          className="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
           disabled={isPlaying}
         >
           <option value="tercera">Tercera (3 notas)</option>
@@ -82,28 +86,36 @@ const ComparadorDeNotas = ({ notes, synth }) => {
         </select>
       </div>
 
-      <button
-        onClick={reproducirNotas}
-        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-        disabled={isPlaying}
-      >
-        ▶️ Tocar Notas
-      </button>
+      <div className="flex gap-3">
+        <button
+          onClick={reproducirNotas}
+          className="flex-1 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+          disabled={isPlaying}
+        >
+          ▶️ Tocar Notas
+        </button>
+        <button
+          onClick={resetJuego}
+          className="flex-1 px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500"
+        >
+          🔄 Reiniciar
+        </button>
+      </div>
 
       {notasActivas.length > 0 && (
-        <div className="mt-4">
-          <p>¿La segunda nota es más…?</p>
-          <div className="flex justify-center gap-4 mt-2">
+        <div className="mt-6 text-center">
+          <p className="mb-2">¿La segunda nota es más…?</p>
+          <div className="flex justify-center gap-4">
             <button
               onClick={() => evaluarRespuesta("grave")}
-              className="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded"
+              className="px-4 py-2 bg-red-300 hover:bg-red-400 rounded disabled:opacity-50"
               disabled={isPlaying}
             >
               ⬇ Grave
             </button>
             <button
               onClick={() => evaluarRespuesta("agudo")}
-              className="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded"
+              className="px-4 py-2 bg-green-300 hover:bg-green-400 rounded disabled:opacity-50"
               disabled={isPlaying}
             >
               ⬆ Agudo
@@ -112,7 +124,7 @@ const ComparadorDeNotas = ({ notes, synth }) => {
           {resultado && (
             <p className="mt-4 text-lg font-bold">{resultado}</p>
           )}
-          <p className="mt-2 text-sm">
+          <p className="mt-2 text-sm text-gray-600">
             Progreso: {stats.correct} / {stats.total}
           </p>
         </div>
