@@ -4,11 +4,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="/favicon.ico" type="image/x-icon" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="app-version" content="<%= APP_VERSION %>">
     <title>Piano Frecuencia Auditiva</title>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
+  <script>
+    window.appVersion = '<%= APP_VERSION %>';
+  </script>
 </html>
 <!-- Clases para que Tailwind las incluya: bg-gray-300 bg-yellow-300 bg-orange-300 bg-sky-300 bg-green-300 bg-purple-300 bg-orange-400 bg-pink-400 -->

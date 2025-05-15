@@ -1,7 +1,7 @@
 {
   "name": "piano-frecuencia",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "homepage": "https://luisalbertofer.github.io/piano-frecuencia",
   "scripts": {
@@ -34,6 +34,7 @@
     "globals": "^16.0.0",
     "postcss": "^8.5.3",
     "tailwindcss": "^4.1.6",
-    "vite": "^6.3.5"
+    "vite": "^6.3.5",
+    "vite-plugin-html": "^3.2.2"
   }
 }
