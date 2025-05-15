@@ -5,6 +5,7 @@ import { notes } from "./notes";
 import VisualizadorOnda from "./VisualizadorOnda";
 import VisualizadorFFT from "./VisualizadorFFT";
 import VisualizadorEspectrograma from "./VisualizadorEspectrograma";
+import { motion, AnimatePresence } from "framer-motion";
 // import ComparadorDeNotas from "./ComparadorDeNotas";
 
 function App() {
@@ -124,9 +125,8 @@ function App() {
           <p className="text-gray-500">Haz clic en una tecla para empezar</p>
         )}
       </div>
-
       <div className="mt-10 w-full max-w-2xl">
-        {/* Tabs */}
+        {/* Pestañas */}
         <div className="flex justify-center gap-2 mb-4">
           <button
             className={`px-4 py-2 rounded ${activeTab === "onda" ? "bg-blue-600 text-white" : "bg-gray-200"}`}
@@ -148,29 +148,48 @@ function App() {
           </button>
         </div>
 
-        {/* Contenido dinámico según pestaña */}
-        {analyser?.waveform && activeTab === "onda" && (
-          <div>
-            <h3 className="text-xl font-semibold mb-2 text-gray-700 text-center">Visualizador de Onda</h3>
-            <VisualizadorOnda analyser={analyser.waveform} />
-          </div>
-        )}
+        {/* Contenido animado */}
+        <AnimatePresence mode="wait">
+          {activeTab === "onda" && analyser?.waveform && (
+            <motion.div
+              key="onda"
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -30 }}
+              transition={{ duration: 0.3 }}
+            >
+              <h3 className="text-xl font-semibold mb-2 text-gray-700 text-center">Visualizador de Onda</h3>
+              <VisualizadorOnda analyser={analyser.waveform} />
+            </motion.div>
+          )}
 
-        {analyser?.fft && activeTab === "fft" && (
-          <div>
-            <h3 className="text-xl font-semibold mb-2 text-gray-700 text-center">Visualizador FFT</h3>
-            <VisualizadorFFT analyser={analyser.fft} currentNote={currentNote} />
-          </div>
-        )}
+          {activeTab === "fft" && analyser?.fft && (
+            <motion.div
+              key="fft"
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -30 }}
+              transition={{ duration: 0.3 }}
+            >
+              <h3 className="text-xl font-semibold mb-2 text-gray-700 text-center">Visualizador FFT</h3>
+              <VisualizadorFFT analyser={analyser.fft} currentNote={currentNote} />
+            </motion.div>
+          )}
 
-        {analyser?.fft && activeTab === "espectrograma" && (
-          <div>
-            <h3 className="text-xl font-semibold mb-2 text-gray-700 text-center">Espectrograma</h3>
-            <VisualizadorEspectrograma analyser={analyser.fft} />
-          </div>
-        )}
+          {activeTab === "espectrograma" && analyser?.fft && (
+            <motion.div
+              key="espectrograma"
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -30 }}
+              transition={{ duration: 0.3 }}
+            >
+              <h3 className="text-xl font-semibold mb-2 text-gray-700 text-center">Espectrograma</h3>
+              <VisualizadorEspectrograma analyser={analyser.fft} />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
-
     </div>
   );
 }
