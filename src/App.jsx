@@ -4,6 +4,7 @@ import * as Tone from "tone";
 import { notes } from "./notes";
 import VisualizadorOnda from "./VisualizadorOnda";
 import VisualizadorFFT from "./VisualizadorFFT";
+import VisualizadorEspectrograma from "./VisualizadorEspectrograma";
 // import ComparadorDeNotas from "./ComparadorDeNotas";
 
 function App() {
@@ -12,6 +13,8 @@ function App() {
   const [timbre, setTimbre] = useState("sine");
   const [isAudioReady, setIsAudioReady] = useState(false);
   const [analyser, setAnalyser] = useState(null);
+  const [activeTab, setActiveTab] = useState("onda");
+
 
   useEffect(() => {
     if (!isAudioReady) return;
@@ -122,21 +125,52 @@ function App() {
         )}
       </div>
 
-      <div className="mt-10 w-full flex flex-col items-center gap-8">
-        {analyser?.waveform && (
-          <div className="w-full max-w-2xl">
+      <div className="mt-10 w-full max-w-2xl">
+        {/* Tabs */}
+        <div className="flex justify-center gap-2 mb-4">
+          <button
+            className={`px-4 py-2 rounded ${activeTab === "onda" ? "bg-blue-600 text-white" : "bg-gray-200"}`}
+            onClick={() => setActiveTab("onda")}
+          >
+            Onda
+          </button>
+          <button
+            className={`px-4 py-2 rounded ${activeTab === "fft" ? "bg-blue-600 text-white" : "bg-gray-200"}`}
+            onClick={() => setActiveTab("fft")}
+          >
+            FFT
+          </button>
+          <button
+            className={`px-4 py-2 rounded ${activeTab === "espectrograma" ? "bg-blue-600 text-white" : "bg-gray-200"}`}
+            onClick={() => setActiveTab("espectrograma")}
+          >
+            Espectrograma
+          </button>
+        </div>
+
+        {/* Contenido dinámico según pestaña */}
+        {analyser?.waveform && activeTab === "onda" && (
+          <div>
             <h3 className="text-xl font-semibold mb-2 text-gray-700 text-center">Visualizador de Onda</h3>
             <VisualizadorOnda analyser={analyser.waveform} />
           </div>
         )}
 
-        {analyser?.fft && (
-          <div className="w-full max-w-2xl">
+        {analyser?.fft && activeTab === "fft" && (
+          <div>
             <h3 className="text-xl font-semibold mb-2 text-gray-700 text-center">Visualizador FFT</h3>
-            <VisualizadorFFT analyser={analyser.fft} />
+            <VisualizadorFFT analyser={analyser.fft} currentNote={currentNote} />
+          </div>
+        )}
+
+        {analyser?.fft && activeTab === "espectrograma" && (
+          <div>
+            <h3 className="text-xl font-semibold mb-2 text-gray-700 text-center">Espectrograma</h3>
+            <VisualizadorEspectrograma analyser={analyser.fft} />
           </div>
         )}
       </div>
+
     </div>
   );
 }
