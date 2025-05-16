@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Piano, Headphones, Menu, X } from "lucide-react";
+import { Piano, Headphones, Menu, X, Ear } from "lucide-react";
 
 const navItems = [
   { path: "/", label: "Piano", icon: <Piano className="w-4 h-4 mr-1" /> },
   { path: "/comparador", label: "Comparador", icon: <Headphones className="w-4 h-4 mr-1" /> },
+  { path: "/juego-rango", label: "Juego Rango", icon: <Ear className="w-4 h-4 mr-1" /> }
 ];
 
 const Navbar = () => {
@@ -18,17 +19,17 @@ const Navbar = () => {
   return (
     <nav className="w-full bg-white shadow-sm p-4 mb-4">
       <div className="max-w-6xl mx-auto flex items-center justify-between">
-        {/* Logo o título si lo necesitas */}
+        {/* Logo o título */}
         <div className="text-xl font-bold text-blue-600">🎵 Piano Frecuencia</div>
 
-        {/* Botón hamburguesa en móvil */}
+        {/* Botón hamburguesa (móvil) */}
         <div className="md:hidden">
           <button onClick={toggleMenu} className="text-blue-600">
             {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
         </div>
 
-        {/* Enlaces en escritorio */}
+        {/* Menú de navegación (escritorio) */}
         <div className="hidden md:flex gap-6 relative">
           {navItems.map(({ path, label, icon }) => {
             const isActive = location.pathname === path;
@@ -36,16 +37,20 @@ const Navbar = () => {
               <NavLink
                 key={path}
                 to={path}
-                className={`relative px-4 py-2 rounded flex items-center gap-1 font-semibold transition-all duration-200
-                  ${
-                    isActive
-                      ? "text-white bg-gradient-to-r from-blue-500 to-purple-500 shadow-lg"
-                      : "text-blue-600 hover:bg-blue-100"
-                  }
-                `}
+                className={`relative px-4 py-2 rounded flex items-center gap-1 font-semibold transition-all duration-200 transform ${
+                  isActive
+                    ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg"
+                    : "text-blue-600 hover:bg-blue-100 hover:scale-105"
+                }`}
               >
-                {icon}
-                {label}
+                {/* Icono con color dinámico */}
+                <span className={isActive ? "text-white" : "text-blue-600"}>
+                  {React.cloneElement(icon, { className: "w-4 h-4 mr-1" })}
+                </span>
+                <span className={isActive ? "text-white" : "text-blue-600"}>
+                  {label}
+                </span>
+
                 {isActive && (
                   <motion.div
                     layoutId="activeNavUnderline"
@@ -56,10 +61,11 @@ const Navbar = () => {
               </NavLink>
             );
           })}
+
         </div>
       </div>
 
-      {/* Menú desplegable móvil */}
+      {/* Menú desplegable (móvil) */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -76,13 +82,11 @@ const Navbar = () => {
                   key={path}
                   to={path}
                   onClick={closeMenu}
-                  className={`px-4 py-2 rounded flex items-center gap-2 font-semibold transition-all duration-200
-                    ${
-                      isActive
-                        ? "text-white bg-gradient-to-r from-blue-500 to-purple-500 shadow"
-                        : "text-blue-600 hover:bg-blue-100"
-                    }
-                  `}
+                  className={`px-4 py-2 rounded flex items-center gap-2 font-semibold transition-all duration-200 ${
+                    isActive
+                      ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow"
+                      : "text-blue-600 hover:bg-blue-100"
+                  }`}
                 >
                   {icon}
                   {label}
