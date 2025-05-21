@@ -4,6 +4,7 @@ import PianoPage from './pages/PianoPage';
 import ComparadorPage from './pages/ComparadorPage';
 import JuegoRangoPage from './pages/JuegoRangoPage';
 import RhythmGamePage from './pages/RhythmGamePage';
+import InstrumentRecognitionPage from './pages/InstrumentRecognitionPage';
 import Navbar from './components/Navbar';
 
 function AnimatedRoutes() {
@@ -16,6 +17,7 @@ function AnimatedRoutes() {
         <Route path="/comparador" element={<ComparadorPage />} />
         <Route path="/juego-rango" element={<JuegoRangoPage />} />
         <Route path="/juego-ritmo" element={<RhythmGamePage />} />
+        <Route path="/reconocimiento-instrumento" element={<InstrumentRecognitionPage />} />
       </Routes>
     </AnimatePresence>
   );
