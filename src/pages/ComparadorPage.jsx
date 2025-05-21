@@ -56,7 +56,7 @@ const ComparadorPage = () => {
 
   return (
     <Layout>
-      <h1 className="text-3xl font-bold text-center mb-4">🎧 Juego: Comparador de Notas</h1>
+      <h1 className="text-3xl font-bold text-center mb-4">🎧 Comparador de Notas</h1>
 
       {!isAudioReady && (
         <div className="text-orange-600 text-lg mb-6 text-center">

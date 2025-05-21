@@ -3,6 +3,7 @@ import { AnimatePresence } from 'framer-motion';
 import PianoPage from './pages/PianoPage';
 import ComparadorPage from './pages/ComparadorPage';
 import JuegoRangoPage from './pages/JuegoRangoPage';
+import RhythmGamePage from './pages/RhythmGamePage';
 import Navbar from './components/Navbar';
 
 function AnimatedRoutes() {
@@ -14,6 +15,7 @@ function AnimatedRoutes() {
         <Route path="/" element={<PianoPage />} />
         <Route path="/comparador" element={<ComparadorPage />} />
         <Route path="/juego-rango" element={<JuegoRangoPage />} />
+        <Route path="/juego-ritmo" element={<RhythmGamePage />} />
       </Routes>
     </AnimatePresence>
   );
