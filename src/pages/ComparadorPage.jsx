@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from "react";
 import Layout from "../components/Layout";
-import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
 import ComparadorDeNotas from "../components/ComparadorDeNotas";
 import { notes } from "../data/notes";
 import * as Tone from "tone";
-import { pageVariants } from "../utils/animationVariants";
+import TimbreSelector from "../components/TimbreSelector";
 
 const ComparadorPage = () => {
   const [synth, setSynth] = useState(null);
   const [isAudioReady, setIsAudioReady] = useState(false);
+  const [timbre, setTimbre] = useState("sine");
+  const [volume, setVolume] = useState(0);
 
+  // Inicializar AudioContext al primer clic/touch
   useEffect(() => {
     const handleFirstInteraction = async () => {
       await Tone.start();
@@ -28,11 +29,30 @@ const ComparadorPage = () => {
     };
   }, []);
 
+  // Crear un synth básico apenas el audio esté listo
   useEffect(() => {
     if (!isAudioReady) return;
-    const newSynth = new Tone.Synth().toDestination();
-    setSynth(newSynth);
+
+    const initialSynth = new Tone.Synth().toDestination();
+    initialSynth.volume.value = volume;
+    setSynth(initialSynth);
+
+    return () => {
+      initialSynth.dispose();
+    };
   }, [isAudioReady]);
+
+  // Actualizar el tipo de oscilador si cambia el timbre
+  useEffect(() => {
+    if (!synth || !isAudioReady) return;
+    synth.oscillator.type = timbre;
+  }, [timbre]);
+
+  // Actualizar el volumen si cambia
+  useEffect(() => {
+    if (!synth || !isAudioReady) return;
+    synth.volume.value = volume;
+  }, [volume]);
 
   return (
     <Layout>
@@ -45,12 +65,20 @@ const ComparadorPage = () => {
       )}
 
       {synth && isAudioReady && (
-        <ComparadorDeNotas notes={notes} synth={synth} />
-      )}
+        <>
+          <div className="mb-6 w-full max-w-md mx-auto">
+            <TimbreSelector 
+              timbre={timbre} 
+              setTimbre={setTimbre} 
+              volume={volume} 
+              setVolume={setVolume} 
+              disabled={!isAudioReady}
+            />
+          </div>
 
-      <Link to="/" className="mt-8 text-blue-600 hover:underline">
-        ← Volver al piano
-      </Link>
+          <ComparadorDeNotas notes={notes} synth={synth} />
+        </>
+      )}
     </Layout>
   );
 };

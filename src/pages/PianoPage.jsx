@@ -8,7 +8,7 @@ import VisualizadorFFT from "../components/visualizers/VisualizadorFFT";
 import VisualizadorEspectrograma from "../components/visualizers/VisualizadorEspectrograma";
 import { motion, AnimatePresence } from "framer-motion";
 import { clasificarFrecuencia, getColor } from "../utils/audioUtils";
-import { pageVariants } from "../utils/animationVariants";
+import TimbreSelector from "../components/TimbreSelector";
 
 function PianoPage() {
   const [currentNote, setCurrentNote] = useState(null);
@@ -76,55 +76,16 @@ function PianoPage() {
           </div>
         )}
 
-        <div className="mb-6 flex items-center gap-2">
-          <label htmlFor="timbre" className="text-lg font-medium">Timbre:</label>
-          <select
-            id="timbre"
-            value={timbre}
-            onChange={(e) => setTimbre(e.target.value)}
-            disabled={!isAudioReady}
-            className="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-          >
-            <option value="sine">Sinusoidal</option>
-            <option value="square">Cuadrada</option>
-            <option value="triangle">Triangular</option>
-            <option value="sawtooth">Diente de sierra</option>
-          </select>
-        </div>
+        <TimbreSelector 
+          timbre={timbre} 
+          setTimbre={setTimbre} 
+          volume={volume} 
+          setVolume={setVolume} 
+          duration={duration} 
+          setDuration={setDuration} 
+          disabled={!isAudioReady}
+        />
 
-        <div className="w-full max-w-sm mb-4">
-          <label htmlFor="volume" className="block text-sm font-medium text-gray-700 mb-1">
-            Volumen: <span className="font-bold">{volume} dB</span>
-          </label>
-          <input
-            id="volume"
-            type="range"
-            min="-60"
-            max="0"
-            step="1"
-            value={volume}
-            onChange={e => setVolume(Number(e.target.value))}
-            disabled={!isAudioReady}
-            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
-          />
-        </div>
-
-        <div className="w-full max-w-sm mb-4">
-          <label htmlFor="duration" className="block text-sm font-medium text-gray-700 mb-1">
-            Duración: <span className="font-bold">{parseFloat(duration).toFixed(1)}s</span>
-          </label>
-          <input
-            id="duration"
-            type="range"
-            min="0.1"
-            max="2"
-            step="0.1"
-            value={duration}
-            onChange={e => setDuration(e.target.value)}
-            disabled={!isAudioReady}
-            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-purple-500"
-          />
-        </div>
         <PianoVirtual notes={notes} playNote={playNote} currentNote={currentNote} />
 
         <div className="mt-6 text-lg text-center">

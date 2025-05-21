@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { GiMusicalNotes } from "react-icons/gi"; // Icono de nota musical
 
 const grados = {
   tercera: 2,
@@ -11,6 +12,8 @@ const ComparadorDeNotas = ({ notes, synth }) => {
   const [notasActivas, setNotasActivas] = useState([]);
   const [dificultad, setDificultad] = useState("quinta");
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isPlayingNote, setIsPlayingNote] = useState(false);
+  const [indicatorColor, setIndicatorColor] = useState("bg-blue-500");
   const [stats, setStats] = useState({ correct: 0, total: 0 });
 
   const generarParDeNotas = () => {
@@ -26,19 +29,26 @@ const ComparadorDeNotas = ({ notes, synth }) => {
   };
 
   const reproducirNotas = () => {
+    if (!synth) return;
+
     const [nota1, nota2] = generarParDeNotas();
     setNotasActivas([nota1, nota2]);
     setResultado(null);
     setIsPlaying(true);
+    setIndicatorColor("bg-blue-500"); // Resetear color
+    setIsPlayingNote(true);
 
     synth.triggerAttackRelease(nota1.note, "0.5", 0);
     synth.triggerAttackRelease(nota2.note, "0.5", "+1.2");
 
-    setTimeout(() => setIsPlaying(false), 2000);
+    setTimeout(() => {
+      setIsPlaying(false);
+      setIsPlayingNote(false);
+    }, 2000);
   };
 
   const evaluarRespuesta = (respuesta) => {
-    if (notasActivas.length < 2 || isPlaying) return;
+    if (!synth || notasActivas.length < 2 || isPlaying) return;
 
     const [n1, n2] = notasActivas;
     const correcta = n2.freq > n1.freq ? "agudo" : "grave";
@@ -50,12 +60,18 @@ const ComparadorDeNotas = ({ notes, synth }) => {
       total: s.total + 1,
     }));
 
+    const newColor = acierto ? "bg-green-500" : "bg-red-500";
+    setIndicatorColor(newColor);
+    setIsPlayingNote(true);
     setIsPlaying(true);
+
     synth.triggerAttackRelease(n1.note, "0.5", "+1.5");
     synth.triggerAttackRelease(n2.note, "0.5", "+2.7");
 
     setTimeout(() => {
       setIsPlaying(false);
+      setIsPlayingNote(false);
+      setIndicatorColor("bg-blue-500"); // Volver al azul original
       reproducirNotas(); // flujo continuo
     }, 4000);
   };
@@ -65,11 +81,24 @@ const ComparadorDeNotas = ({ notes, synth }) => {
     setNotasActivas([]);
     setResultado(null);
     setIsPlaying(false);
+    setIndicatorColor("bg-blue-500");
+    setIsPlayingNote(false);
   };
 
   return (
     <div className="w-full max-w-3xl mx-auto mt-8 p-6 border rounded bg-white shadow-md">
       <h2 className="text-2xl font-bold mb-4 text-center">🎵 Comparador de Notas</h2>
+
+      {/* Indicador visual con icono */}
+      <div className="mt-4 flex justify-center min-h-[4rem]">
+        <div
+          className={`transition-all duration-300 w-16 h-16 rounded-full flex items-center justify-center ${
+            isPlayingNote ? `${indicatorColor} animate-pulse` : "opacity-0"
+          }`}
+        >
+          <GiMusicalNotes className="text-white text-xl" />
+        </div>
+      </div>
 
       <div className="mb-4 flex flex-col gap-2">
         <label htmlFor="dificultad" className="font-medium">Dificultad:</label>
@@ -90,9 +119,9 @@ const ComparadorDeNotas = ({ notes, synth }) => {
         <button
           onClick={reproducirNotas}
           className="flex-1 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
-          disabled={isPlaying}
+          disabled={isPlaying || !synth}
         >
-          ▶️ Tocar Notas
+          {isPlaying ? "⏳ Tocando…" : "▶️ Tocar Notas"}
         </button>
         <button
           onClick={resetJuego}
