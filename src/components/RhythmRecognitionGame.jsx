@@ -1,5 +1,6 @@
 import React, { useState, useRef } from "react";
 import * as Tone from "tone";
+import { Volume2, Check, X } from 'lucide-react';
 
 const RhythmRecognitionGame = () => {
   const [sequence, setSequence] = useState([]);
@@ -7,6 +8,7 @@ const RhythmRecognitionGame = () => {
   const [selectedOption, setSelectedOption] = useState(null);
   const [feedback, setFeedback] = useState("");
   const [stats, setStats] = useState({ correct: 0, total: 0 });
+  const [isPlayingRhythm, setIsPlayingRhythm] = useState(false);
   const synthRef = useRef(
     new Tone.Synth({
       oscillator: { type: "square" }, // ¡Sonido tipo tambor!
@@ -118,47 +120,86 @@ const renderWaveform = (pattern) => {
   );
 };
 
-  return (
-    <div className="w-full max-w-md mx-auto p-6 border rounded shadow bg-white">
-      <h2 className="text-xl font-bold mb-4">🥁 Reconoce el Ritmo</h2>
+return (
+  <div className="w-full max-w-md mx-auto p-6 border rounded shadow-lg bg-gradient-to-br from-blue-50 to-indigo-100">
+    {/* Título */}
+    <h2 className="text-2xl font-bold mb-4 text-center flex items-center justify-center gap-2 text-indigo-800">
+      <Volume2 className="w-5 h-5" />
+      Reconoce el Ritmo
+    </h2>
 
-      <div className="flex justify-center mb-6">
-        <button
-          onClick={generateSequence}
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+    {/* Botón para escuchar */}
+    <div className="flex justify-center mb-6">
+      <button
+        onClick={generateSequence}
+        disabled={isPlayingRhythm}
+        className={`px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-lg shadow-md hover:from-indigo-700 hover:to-purple-700 transition-all transform hover:scale-105 flex items-center ${
+          isPlayingRhythm ? "opacity-60 cursor-not-allowed" : ""
+        }`}
+      >
+        {isPlayingRhythm ? (
+          <>
+            <svg className="animate-spin mr-2 h-5 w-5" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
+            </svg>
+            Reproduciendo...
+          </>
+        ) : (
+          <>
+            <Volume2 className="mr-2" /> Escuchar Ritmo
+          </>
+        )}
+      </button>
+    </div>
+
+    {/* Opciones */}
+    <div className="grid grid-cols-1 gap-4 mb-6">
+      {options.map((opt, index) => (
+        <div
+          key={index}
+          className={`p-4 border rounded-xl transition-all duration-300 ease-in-out ${
+            selectedOption === index
+              ? "bg-indigo-100 border-indigo-400 shadow-inner scale-105"
+              : "bg-white hover:bg-indigo-50 border-gray-200 hover:border-indigo-300"
+          }`}
+          onClick={() => handleSelect(index)}
         >
-          🔊 Escuchar Ritmo
-        </button>
-      </div>
-
-      <div className="grid grid-cols-1 gap-4 mb-6">
-        {options.map((opt, index) => (
-          <div
-            key={index}
-            className={`p-3 border rounded flex items-center justify-between cursor-pointer ${
-              selectedOption === index
-                ? "bg-blue-100 border-blue-500"
-                : "hover:bg-gray-100"
-            }`}
-            onClick={() => handleSelect(index)}
-          >
-            <div>{renderWaveform(opt)}</div>
+          <div className="flex items-center justify-between">
+            <div className="flex-1">{renderWaveform(opt)}</div>
             {selectedOption === index && feedback && (
-              <span className="ml-2 text-sm font-semibold">
-                {index === options.findIndex(o => JSON.stringify(o) === JSON.stringify(sequence)) ? "✅" : "❌"}
+              <span className="ml-3">
+                {index === options.findIndex(o => JSON.stringify(o) === JSON.stringify(sequence)) ? (
+                  <Check className="text-green-600" size={24} />
+                ) : (
+                  <X className="text-red-600" size={24} />
+                )}
               </span>
             )}
           </div>
-        ))}
+        </div>
+      ))}
+    </div>
+
+    {/* Resultado */}
+    {feedback && (
+      <div className="mb-6 text-center animate-fade-in-down">
+        <p className={`text-xl font-bold ${feedback.startsWith("✅") ? "text-green-600" : "text-red-600"}`}>
+          {feedback}
+        </p>
       </div>
+    )}
 
-      {feedback && <p className="text-lg font-bold text-center">{feedback}</p>}
-
-      <p className="mt-4 text-sm text-gray-600 text-center">
-        Progreso: {stats.correct} / {stats.total}
+    {/* Estadísticas */}
+    <div className="mt-4 text-center">
+      <p className="text-sm text-gray-600">
+        Progreso:{" "}
+        <span className="font-medium text-gray-800">
+          {stats.correct} / {stats.total}
+        </span>
       </p>
     </div>
-  );
+  </div>
+);
 };
 
 export default RhythmRecognitionGame;
