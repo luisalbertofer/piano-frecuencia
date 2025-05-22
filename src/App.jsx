@@ -5,6 +5,7 @@ import ComparadorPage from './pages/ComparadorPage';
 import JuegoRangoPage from './pages/JuegoRangoPage';
 import RhythmGamePage from './pages/RhythmGamePage';
 import InstrumentRecognitionPage from './pages/InstrumentRecognitionPage';
+import PianoRealPage from './pages/PianoRealPage';
 import Navbar from './components/Navbar';
 import MainMenuPage from './pages/MainMenuPage';
 
@@ -20,6 +21,8 @@ function AnimatedRoutes() {
         <Route path="/juego-rango" element={<JuegoRangoPage />} />
         <Route path="/juego-ritmo" element={<RhythmGamePage />} />
         <Route path="/reconocimiento-instrumento" element={<InstrumentRecognitionPage />} />
+        <Route path="/piano-real" element={<PianoRealPage />} />
+        {/* Puedes agregar más rutas aquí */}
       </Routes>
     </AnimatePresence>
   );
