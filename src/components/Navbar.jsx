@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Piano, Headphones, Menu, X, Ear, Drum, Music } from "lucide-react";
+import { Piano, Headphones, Menu, X, Ear, Drum, Music, House } from "lucide-react";
 
 const navItems = [
-  { path: "/", label: "Piano", icon: <Piano className="w-4 h-4 mr-1" /> },
+  { path: "/", label: "Home", icon: <House className="w-4 h-4 mr-1" /> },
+  { path: "/piano", label: "Piano", icon: <Piano className="w-4 h-4 mr-1" /> },
   { path: "/comparador", label: "Comparador", icon: <Headphones className="w-4 h-4 mr-1" /> },
   { path: "/juego-rango", label: "Rango", icon: <Ear className="w-4 h-4 mr-1" /> },
   { path: "/juego-ritmo", label: "Ritmo", icon: <Drum className="w-4 h-4 mr-1" /> },

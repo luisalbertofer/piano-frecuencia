@@ -6,6 +6,7 @@ import JuegoRangoPage from './pages/JuegoRangoPage';
 import RhythmGamePage from './pages/RhythmGamePage';
 import InstrumentRecognitionPage from './pages/InstrumentRecognitionPage';
 import Navbar from './components/Navbar';
+import MainMenuPage from './pages/MainMenuPage';
 
 function AnimatedRoutes() {
   const location = useLocation();
@@ -13,7 +14,8 @@ function AnimatedRoutes() {
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
-        <Route path="/" element={<PianoPage />} />
+        <Route path="/" element={<MainMenuPage />} />
+        <Route path="/piano" element={<PianoPage />} />
         <Route path="/comparador" element={<ComparadorPage />} />
         <Route path="/juego-rango" element={<JuegoRangoPage />} />
         <Route path="/juego-ritmo" element={<RhythmGamePage />} />
