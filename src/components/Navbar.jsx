@@ -10,7 +10,7 @@ const navItems = [
   { path: "/juego-rango", label: "Rango", icon: <Ear className="w-4 h-4 mr-1" /> },
   { path: "/juego-ritmo", label: "Ritmo", icon: <Drum className="w-4 h-4 mr-1" /> },
   { path: "/reconocimiento-instrumento", label: "Instrumentos", icon: <Music className="w-4 h-4 mr-1" /> },
-  { path: "/piano-real", label: "Piano (muestras)", icon: <Piano className="w-4 h-4 mr-1" /> }
+  { path: "/piano-real", label: "Instrumentos Reales", icon: <Piano className="w-4 h-4 mr-1" /> }
 ];
 
 const Navbar = () => {

@@ -15,7 +15,7 @@ const getColorByOctave = (note) => {
   return colors[octave] || "bg-white";
 };
 
-const PianoRealVisual = ({ notes, playNote, currentNote }) => {
+const PianoRealVirtual = ({ notes, playNote, currentNote }) => {
   // Notas ordenadas como en un piano físico (de C1 a C8)
   const whiteOrder = ["C", "D", "E", "F", "G", "A", "B"];
   const blackMap = {
@@ -94,4 +94,4 @@ const PianoRealVisual = ({ notes, playNote, currentNote }) => {
   );
 };
 
-export default PianoRealVisual;
+export default PianoRealVirtual;
