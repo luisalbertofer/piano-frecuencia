@@ -16,13 +16,7 @@ const TimbreSelector = ({ timbre, setTimbre, volume, setVolume, duration, setDur
           <option value="square">Cuadrada</option>
           <option value="triangle">Triangular</option>
           <option value="sawtooth">Diente de sierra</option>
-          <option value="real">Piano real (muestras)</option>
         </select>
-        {timbre === "real" && (
-          <p className="mt-2 text-sm text-blue-700 italic">
-            Estás usando muestras reales de piano 🎹. Mejora la precisión auditiva al reproducir sonidos auténticos.
-          </p>
-        )}
       </div>
 
       {setVolume && (
@@ -44,7 +38,7 @@ const TimbreSelector = ({ timbre, setTimbre, volume, setVolume, duration, setDur
         </div>
       )}
 
-      {setDuration && timbre !== "real" && (
+      {setDuration && (
         <div>
           <label htmlFor="duration" className="block text-sm font-medium text-gray-700 mb-1">
             Duración: <span className="font-bold">{parseFloat(duration).toFixed(1)}s</span>
