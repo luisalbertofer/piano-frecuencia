@@ -68,7 +68,7 @@ function PianoPage() {
   return (
     <Layout>
       <div className="min-h-screen bg-white text-gray-800 font-sans p-4 flex flex-col items-center">
-        <h1 className="text-3xl font-bold mb-4">🎹 Piano Frecuencia Visual</h1>
+        <h1 className="text-3xl font-bold mb-4">🎹 Explorador de Frecuencias Musicales</h1>
 
         {!isAudioReady && (
           <div className="text-orange-600 text-lg mb-6">

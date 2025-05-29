@@ -1,231 +1,146 @@
-// src/components/InstrumentRecognitionGame.jsx
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState } from "react";
 import * as Tone from "tone";
-import { Check, X } from "lucide-react";
-
-// Lista de instrumentos disponibles con sus configuraciones
-const instruments = [
-  { id: "piano", name: "Piano", color: "bg-blue-500" },
-  { id: "flute", name: "Flauta", color: "bg-green-500" },
-  { id: "xylophone", name: "Xilófono", color: "bg-yellow-500" },
-  { id: "french-horn", name: "Trompa", color: "bg-red-500" },
-  { id: "violin", name: "Violín", color: "bg-purple-500" },
-  { id: "trumpet", name: "Trompeta", color: "bg-orange-500" },
-];
+import { Volume2, Check, X } from "lucide-react";
 
 const InstrumentRecognitionGame = () => {
-  const [currentInst, setCurrentInst] = useState(null);
+  const [currentInstrument, setCurrentInstrument] = useState(null);
   const [options, setOptions] = useState([]);
   const [selectedOption, setSelectedOption] = useState(null);
   const [feedback, setFeedback] = useState("");
   const [stats, setStats] = useState({ correct: 0, total: 0 });
-  const [isLoading, setIsLoading] = useState(true);
-  const [loadingProgress, setLoadingProgress] = useState(0);
 
-  // Referencias para los instrumentos cargados
-  const instrumentsRef = useRef({});
-  const prevInstRef = useRef(null);
+  // Tus instrumentos con sus audios
+  const instruments = [
+    { name: "Violín", audioPath: "/audio/violin.mp3" },
+    { name: "Flauta", audioPath: "/audio/flute.mp3" },
+    { name: "Guitarra", audioPath: "/audio/guitar.mp3" },
+    { name: "Piano", audioPath: "/audio/piano.mp3" },
+  ];
 
-  // Cargar instrumentos al iniciar
-  useEffect(() => {
-    window.Tone = Tone;
-    // Asegurarse de que SampleLibrary esté disponible
-    if (typeof window.SampleLibrary === 'undefined') {
-      console.error("SampleLibrary no está disponible. Verifica que Tonejs-Instruments.js esté cargado correctamente.");
-      return;
-    }
+  // Iniciar nueva pregunta
+  const startNewRound = () => {
+    const correctIndex = Math.floor(Math.random() * instruments.length);
+    const correct = instruments[correctIndex];
 
-    // Configurar la URL base para las muestras
-    window.SampleLibrary.baseUrl = '/piano-frecuencia/samples/audio/';
-    
-    // Cargar instrumentos de forma progresiva
-    const loadInstruments = async () => {
-      setIsLoading(true);
-      const totalInstruments = instruments.length;
-      
-      for (let i = 0; i < totalInstruments; i++) {
-        const inst = instruments[i];
-        try {
-          // Cargar instrumento con optimización (minify: true reduce la cantidad de muestras)
-          const loadedInst = await new Promise(resolve => {
-            const sampler = window.SampleLibrary.load({
-              instruments: inst.id,
-              minify: true,
-              onload: () => resolve(sampler)
-            });
-            // Conectar a la salida principal
-            sampler.toDestination();
-          });
-          
-          // Guardar instrumento cargado
-          instrumentsRef.current[inst.id] = loadedInst;
-          
-          // Actualizar progreso
-          setLoadingProgress(Math.round(((i + 1) / totalInstruments) * 100));
-        } catch (error) {
-          console.error(`Error al cargar el instrumento ${inst.id}:`, error);
-        }
+    // Generar 2 opciones distintas
+    let otherOptions = [];
+    while (otherOptions.length < 2) {
+      const randIndex = Math.floor(Math.random() * instruments.length);
+      const candidate = instruments[randIndex];
+      if (!otherOptions.includes(candidate) && candidate !== correct) {
+        otherOptions.push(candidate);
       }
-      
-      setIsLoading(false);
-    };
-
-    loadInstruments();
-
-    // Limpiar al desmontar
-    return () => {
-      // Dispose de los instrumentos cargados
-      Object.values(instrumentsRef.current).forEach(inst => {
-        if (inst && typeof inst.dispose === 'function') {
-          inst.dispose();
-        }
-      });
-    };
-  }, []);
-
-  // Reproducir instrumento seleccionado
-  const playInstrument = (instrumentId) => {
-    const instrument = instrumentsRef.current[instrumentId];
-    if (!instrument) {
-      console.error(`Instrumento ${instrumentId} no encontrado`);
-      return;
     }
 
-    // Seleccionar una nota aleatoria dentro del rango del instrumento
-    const notes = ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4'];
-    const randomNote = notes[Math.floor(Math.random() * notes.length)];
-    
-    // Reproducir la nota
-    instrument.triggerAttackRelease(randomNote, "2n");
-  };
+    const allOptions = shuffleArray([correct, ...otherOptions]);
 
-  // Sonido de feedback positivo o negativo
-  const playFeedbackSound = (isCorrect) => {
-    const synth = new Tone.Synth().toDestination();
-    const note = isCorrect ? "C5" : "A2";
-    synth.triggerAttackRelease(note, "8n");
-  };
-
-  // Generar nueva pregunta con opciones
-  const generateQuestion = () => {
-    if (isLoading || Object.keys(instrumentsRef.current).length === 0) {
-      console.warn("Los instrumentos aún no están cargados");
-      return;
-    }
-
-    let shuffled;
-    let newCurrent;
-
-    do {
-      shuffled = [...instruments].sort(() => Math.random() - 0.5);
-      newCurrent = shuffled[0];
-    } while (newCurrent.id === prevInstRef.current?.id);
-
-    prevInstRef.current = newCurrent;
-
-    setCurrentInst(newCurrent);
-    setOptions(shuffled.slice(0, 4)); // 4 opciones
+    setCurrentInstrument(correct);
+    setOptions(allOptions);
     setSelectedOption(null);
     setFeedback("");
+  };
 
-    playInstrument(newCurrent.id);
+  // Reproducir el audio del instrumento
+  const playAudio = async () => {
+    if (!currentInstrument) return;
+
+    await Tone.start(); // Necesario en algunos navegadores
+
+    const player = new Tone.Player(currentInstrument.audioPath).toDestination();
+    player.autostart = true;
   };
 
   // Evaluar respuesta
-  const evaluateAnswer = (optionId) => {
-    const isCorrect = optionId === currentInst.id;
-    setSelectedOption(optionId);
+  const handleSelect = (index) => {
+    const selected = options[index];
+    setSelectedOption(index);
 
-    if (isCorrect) {
+    if (selected === currentInstrument) {
       setFeedback("✅ ¡Correcto!");
-      setStats((prev) => ({ correct: prev.correct + 1, total: prev.total + 1 }));
+      setStats((s) => ({ ...s, correct: s.correct + 1 }));
     } else {
-      setFeedback(`❌ Era: ${currentInst.name}`);
-      setStats((prev) => ({ ...prev, total: prev.total + 1 }));
+      setFeedback(`❌ Incorrecto. Era ${currentInstrument.name}`);
     }
 
-    playFeedbackSound(isCorrect);
+    setStats((s) => ({ ...s, total: s.total + 1 }));
   };
 
-  // Reproducir de nuevo el sonido actual
-  const replaySound = () => {
-    if (currentInst) {
-      playInstrument(currentInst.id);
+  // Función auxiliar: mezclar array
+  const shuffleArray = (array) => {
+    const newArray = [...array];
+    for (let i = newArray.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
     }
+    return newArray;
   };
 
   return (
-    <div className="w-full max-w-md mx-auto p-6 border rounded shadow-lg bg-white">
-      <h2 className="text-xl font-bold mb-4 text-center">🎵 ¿Qué instrumento es?</h2>
+    <div className="w-full max-w-md mx-auto p-6 border rounded shadow-lg bg-gradient-to-br from-blue-50 to-indigo-100">
+      <h2 className="text-2xl font-bold mb-4 text-center flex items-center justify-center gap-2 text-indigo-800">
+        <Volume2 className="w-5 h-5" />
+        Reconoce el Instrumento
+      </h2>
+      <p className="text-sm text-gray-600 text-center mb-6 italic">
+        🛠️ Página en construcción – Buscando audios adecuados para los instrumentos
+      </p>
 
-      {isLoading ? (
-        <div className="mb-6">
-          <p className="text-center mb-2">Cargando instrumentos... {loadingProgress}%</p>
-          <div className="w-full bg-gray-200 rounded-full h-2.5">
-            <div 
-              className="bg-indigo-600 h-2.5 rounded-full" 
-              style={{ width: `${loadingProgress}%` }}
-            ></div>
+
+      {/* Botón para escuchar */}
+      <div className="flex justify-center mb-6">
+        <button
+          onClick={startNewRound}
+          className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-lg shadow-md hover:from-indigo-700 hover:to-purple-700 transition-all transform hover:scale-105 flex items-center"
+        >
+          <Volume2 className="mr-2" /> Escuchar Instrumento
+        </button>
+      </div>
+
+      {/* Opciones */}
+      <div className="grid grid-cols-1 gap-4 mb-6">
+        {options.map((opt, index) => (
+          <div
+            key={index}
+            className={`p-4 border rounded-xl transition-all duration-300 ease-in-out ${selectedOption === index
+              ? "bg-indigo-100 border-indigo-400 scale-105"
+              : "bg-white hover:bg-indigo-50 border-gray-200 hover:border-indigo-300"
+              }`}
+            onClick={() => handleSelect(index)}
+          >
+            <div className="flex items-center justify-between">
+              <span>{opt.name}</span>
+              {selectedOption === index && feedback && (
+                <span>
+                  {opt === currentInstrument ? (
+                    <Check className="text-green-600" size={24} />
+                  ) : (
+                    <X className="text-red-600" size={24} />
+                  )}
+                </span>
+              )}
+            </div>
           </div>
-        </div>
-      ) : (
-        <>
-          {/* Botones de control */}
-          <div className="flex justify-center gap-3 mb-6">
-            <button
-              onClick={generateQuestion}
-              className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 flex items-center"
-            >
-              🔊 Nueva pregunta
-            </button>
-            {currentInst && (
-              <button
-                onClick={replaySound}
-                className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 flex items-center"
-              >
-                🔄 Repetir sonido
-              </button>
-            )}
-          </div>
+        ))}
+      </div>
 
-          {/* Opciones */}
-          <div className="grid grid-cols-1 gap-3 mb-6">
-            {options.map((opt) => (
-              <button
-                key={opt.id}
-                onClick={() => evaluateAnswer(opt.id)}
-                disabled={selectedOption !== null}
-                className={`flex items-center justify-between p-3 border rounded transition-all ${
-                  selectedOption === opt.id
-                    ? `${opt.color} text-white`
-                    : "bg-gray-100 hover:bg-gray-200"
-                }`}
-                aria-label={`Opción: ${opt.name}`}
-                title={opt.name}
-              >
-                <span>{opt.name}</span>
-                {selectedOption === opt.id && (
-                  <span>
-                    {opt.id === currentInst?.id ? (
-                      <Check className="text-white" />
-                    ) : (
-                      <X className="text-white" />
-                    )}
-                  </span>
-                )}
-              </button>
-            ))}
-          </div>
-
-          {/* Feedback */}
-          {feedback && <p className="text-lg font-bold text-center">{feedback}</p>}
-
-          {/* Estadísticas */}
-          <p className="mt-4 text-sm text-gray-600 text-center">
-            Progreso: {stats.correct} / {stats.total}
+      {/* Resultado */}
+      {feedback && (
+        <div className="mb-6 text-center">
+          <p className={`text-xl font-bold ${feedback.startsWith("✅") ? "text-green-600" : "text-red-600"}`}>
+            {feedback}
           </p>
-        </>
+        </div>
       )}
+
+      {/* Estadísticas */}
+      <div className="mt-4 text-center">
+        <p className="text-sm text-gray-600">
+          Progreso:{" "}
+          <span className="font-medium text-gray-800">
+            {stats.correct} / {stats.total}
+          </span>
+        </p>
+      </div>
     </div>
   );
 };
