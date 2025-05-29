@@ -28,7 +28,9 @@ const InstrumentRecognitionPage = () => {
     <Layout>
       <div className="min-h-screen bg-white text-gray-800 font-sans p-4 flex flex-col items-center">
         <h1 className="text-3xl font-bold mb-4">🎹 Reconoce el Instrumento</h1>
-
+        <span className="inline-block px-3 py-1 text-sm font-medium text-yellow-800 bg-yellow-100 rounded-full mb-6">
+          ⚠️ En desarrollo – Audios en revisión
+        </span>
         {!audioReady && (
           <p className="text-orange-500 text-lg mb-6 text-center">
             Pulsa en cualquier parte para activar el audio.

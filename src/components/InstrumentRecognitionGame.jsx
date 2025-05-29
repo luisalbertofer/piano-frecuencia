@@ -81,11 +81,6 @@ const InstrumentRecognitionGame = () => {
         <Volume2 className="w-5 h-5" />
         Reconoce el Instrumento
       </h2>
-      <p className="text-sm text-gray-600 text-center mb-6 italic">
-        🛠️ Página en construcción – Buscando audios adecuados para los instrumentos
-      </p>
-
-
       {/* Botón para escuchar */}
       <div className="flex justify-center mb-6">
         <button
